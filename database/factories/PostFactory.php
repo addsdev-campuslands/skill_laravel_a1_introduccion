@@ -16,10 +16,19 @@ class PostFactory extends Factory
      */
     public function definition(): array
     {
+
         return [
             'title' => fake()->sentence(10),
             'content' => fake()->paragraph(),
-            'status' => true,
+            'slug' => fake()->uuid(),
+            'status' => fake()->randomElement(['draft', 'published', 'archived', 'default']),
+            'published_at' => fake()->dateTime(),
+            'cover_image' => "https://placehold.co/600x400/000000/FFFFFF.png",
+            'tags' => [fake()->sentence(2), fake()->sentence(2)],
+            'meta' => [
+                'seo_title' => fake()->sentence(3),
+                'seo_desc' => fake()->sentence(6),
+            ]
         ];
     }
 }

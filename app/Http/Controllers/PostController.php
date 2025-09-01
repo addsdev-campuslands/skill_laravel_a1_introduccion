@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StorePostRequest;
 use Illuminate\Http\Request;
 use App\Models\Post;
 use App\Traits\ApiResponse;
-//TODO: Eliminar
-use Illuminate\Support\Facades\DB;
 
 class PostController extends Controller
 {
@@ -24,13 +23,10 @@ class PostController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StorePostRequest $request)
     {
-        //$newPost = Post::create($request->only(['title','content', 'status']));
-        $newPost = Post::updateOrCreate(
-            ['title' => $request->title], //la columnas a comparar para la validacion
-            $request->only(['title','content', 'status'] // Columnas a registrar o actualizar
-        ));
+        $data = $request->validated();
+        $newPost = Post::create($data);
         return $this->ok("Todo melo mor", [$newPost]);
     }
 
@@ -41,7 +37,7 @@ class PostController extends Controller
     {
         //$result = Post::findOrFail($id);
         $result = Post::find($id);
-        if($result) {
+        if ($result) {
             return $this->ok("Todo ok, como dijo el Pibe", $result);
         } else {
             return $this->success("Todo mal, como NO dijo el Pibe", [], 404);

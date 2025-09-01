@@ -11,7 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if(Schema::hasTable('post')) { return; }
+        if (Schema::hasTable('posts')) {
+            return;
+        }
+
         Schema::table('posts', function (Blueprint $table) {
             // Agregar las nuevas columnas
             $table->dropColumn([
@@ -19,12 +22,12 @@ return new class extends Migration
             ]);
 
             $table->string('slug', 220)->unique();
-            $table->enum('status', ['draft','published','archived', 'default'])->default('draft');
+            $table->enum('status', ['draft', 'published', 'archived', 'default'])->default('draft');
             $table->timestamp('published_at')->nullable();
             $table->string('cover_image')->nullable();
 
-            $table->json('meta')->nullable();// {"seo_title": "....", ....}
-            $table->json('tags')->nullable();// ['php', 'git', .....]
+            $table->json('meta')->nullable(); // {"seo_title": "....", ....}
+            $table->json('tags')->nullable(); // ['php', 'git', .....]
 
             $table->softDeletes();
 
@@ -48,19 +51,19 @@ return new class extends Migration
                 'deleted_at'
             ];
 
-            for ($i=0; $i < count($columns); $i++) { 
+            for ($i = 0; $i < count($columns); $i++) {
                 $column = $columns[$i];
-                if(Schema::hasColumn('posts', $column)) {
+                if (Schema::hasColumn('posts', $column)) {
                     $table->dropColumn($column);
                 }
             }
 
             //$table->dropIndex(['status', 'published_at']);
 
-            if(Schema::hasIndex('posts',['status','published_at', 'unique'])) {
+            if (Schema::hasIndex('posts', ['status', 'published_at', 'unique'])) {
                 $table->dropIndex('posts_status_published_at_index');
             }
-            
+
 
             $table->boolean('status')->change();
         });
