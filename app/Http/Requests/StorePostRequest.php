@@ -38,7 +38,16 @@ class StorePostRequest extends FormRequest
 
             'status' => ['required', Rule::in(['draft', 'published', 'archived', 'default'])],
             'published_at' => ['nullable', 'date', 'required_if:status,published', 'before_or_equal:now'],
-            'cover_image' => ['nullable', 'file', 'mimetypes:image/jpeg,image/png,image/webp', 'max:2048']
+            'cover_image' => ['nullable', 'file', 'mimetypes:image/jpeg,image/png,image/webp', 'max:2048'],
+
+            'tags' => ['nullable', 'array', 'max:20'],
+            'tags.*' => ['string', 'min:2', 'max:30', 'distinct'],
+            'meta' => ['nullable', 'array'],
+            'meta.seo_title' => ['nullable', 'string', 'max:60'],
+            'meta.seo_desc' => ['nullable', 'string', 'max:120'],
+
+            'category_ids' => ['nullable', 'array', 'max:10'],
+            'category_ids.*' => ['integer', 'exists:categories,id']
         ];
     }
 

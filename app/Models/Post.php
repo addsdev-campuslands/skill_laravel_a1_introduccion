@@ -26,7 +26,9 @@ class Post extends Model
     protected $casts = [
         'published_at' => 'datetime',
         'tags' => 'array',
-        'meta' => 'array'
+        'meta' => 'array',
+        'published_at' => 'datetime',
+        'deleted_at'   => 'datetime',
     ];
 
     public function categories()
