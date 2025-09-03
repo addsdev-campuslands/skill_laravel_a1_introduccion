@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\HtmlSafe;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -34,7 +35,8 @@ class StorePostRequest extends FormRequest
         return [
             'title' => ['required', 'string', 'min:4', 'max:200'],
             'slug' => ['required', 'string', 'max:220', 'unique:posts,slug'],
-            'content' => ['required', 'string', 'min:20'],
+            //use App\Rules\HtmlSafe;
+            'content' => ['required', 'string', 'min:20', new HtmlSafe],
 
             'status' => ['required', Rule::in(['draft', 'published', 'archived', 'default'])],
             'published_at' => ['nullable', 'date', 'required_if:status,published', 'before_or_equal:now'],

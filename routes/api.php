@@ -14,3 +14,4 @@ Route::post('/login', [AuthController::class, 'login']);
 
 Route::apiResource('blog', BlogController::class);
 Route::apiResource('posts', PostController::class);
+Route::post('posts/{id}/restore', [PostController::class, 'restore']);
