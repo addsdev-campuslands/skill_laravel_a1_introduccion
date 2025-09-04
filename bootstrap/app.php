@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\ForceJsonResponse;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -11,6 +12,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -20,7 +22,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
+        $middleware->appendToGroup('api', [
+            ForceJsonResponse::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->shouldRenderJsonWhen(
@@ -81,6 +85,15 @@ return Application::configure(basePath: dirname(__DIR__))
                 'message' => 'Método no permitido.',
                 'errors'  => [],
             ], 405);
+        });
+
+        // Limite de peticiones (429)
+        $exceptions->render(function (TooManyRequestsHttpException $e, $request) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Limite de petenciones.',
+                'errors'  => [],
+            ], 429);
         });
 
         //Generico
