@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (Schema::hasTable('posts')) {
-            return;
-        }
+        // if (Schema::hasTable('posts')) {
+        //     return;
+        // }
 
         Schema::table('posts', function (Blueprint $table) {
             // Agregar las nuevas columnas
