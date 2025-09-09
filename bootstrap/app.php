@@ -30,6 +30,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => RoleMiddleware::class,
             'scopes' => CheckToken::class,  // TODOS
             'scope'  => CheckTokenForAnyScope::class, // ALGUNO
+            // Agrega el alias para tu middleware de Supabase aquí
+            'supabase.auth' => \App\Http\Middleware\SupabaseAuthMiddleware::class,
         ]);
 
         $middleware->appendToGroup('api', [
