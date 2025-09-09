@@ -20,8 +20,9 @@ Route::prefix('posts')->group(function () {
     //Escritor o administrador
     Route::middleware(['throttle:api', 'auth:api', 'role:editor,admin'])->group(function () {
         Route::post('/', [PostController::class, 'store'])->middleware('scopes:posts.write');
-        Route::put('{post}', [PostController::class, 'update'])->middleware('scopes:posts.write');;
-        Route::delete('{post}', [PostController::class, 'destroy']);
+        // can:action,model
+        Route::put('{post}', [PostController::class, 'update'])->middleware(['scopes:posts.write', 'can:update,post']);
+        Route::delete('{post}', [PostController::class, 'destroy'])->middleware(['can:delete,post']);;
         Route::post('{post}/restore', [PostController::class, 'restore'])
             ->middleware('scopes:posts.write');
     });

@@ -20,16 +20,21 @@ class Post extends Model
         'published_at',
         'cover_image',
         'tags',
-        'meta'
+        'meta',
+        'user_id'
     ];
 
     protected $casts = [
         'published_at' => 'datetime',
         'tags' => 'array',
         'meta' => 'array',
-        'published_at' => 'datetime',
         'deleted_at'   => 'datetime',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
     public function categories()
     {
