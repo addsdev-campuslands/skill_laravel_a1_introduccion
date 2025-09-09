@@ -10,6 +10,8 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Laravel\Passport\Http\Middleware\CheckToken;
+use Laravel\Passport\Http\Middleware\CheckTokenForAnyScope;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
@@ -26,6 +28,8 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'role' => RoleMiddleware::class,
+            'scopes' => CheckToken::class,  // TODOS
+            'scope'  => CheckTokenForAnyScope::class, // ALGUNO
         ]);
 
         $middleware->appendToGroup('api', [
@@ -105,10 +109,23 @@ return Application::configure(basePath: dirname(__DIR__))
         //Generico
         $exceptions->render(function (\Throwable $e, $request) {
             $status = $e instanceof HttpExceptionInterface ?  $e->getStatusCode() : 500;
+
+            // Solo incluir detalles del error en desarrollo
+            $errors = [];
+            if (config('app.debug')) {
+                $errors = [
+                    'exception' => get_class($e),
+                    'message' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                    'trace' => $e->getTraceAsString()
+                ];
+            }
+
             return response()->json([
                 'status'  => 'error',
                 'message' => $status === 500 ? 'Error interno en el servidor' : $e->getMessage(),
-                'errors'  => ['exception', $e],
-            ]);
+                'errors'  => $errors,
+            ], $status);
         });
     })->create();

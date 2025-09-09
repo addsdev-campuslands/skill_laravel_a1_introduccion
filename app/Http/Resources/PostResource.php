@@ -21,6 +21,13 @@ class PostResource extends JsonResource
             'slug' => $this->slug,
             'status' => $this->status,
             'cover_image' => $this->cover_image,
+            'user' => $this->whenLoaded('user', function () {
+                return [
+                    'id' => $this->user->id,
+                    'name' => $this->user->name,
+                    'email' => $this->user->email
+                ];
+            }),
             'categories' => $this->categories->map(function ($category) {
                 return [
                     'id' => $category->id,
