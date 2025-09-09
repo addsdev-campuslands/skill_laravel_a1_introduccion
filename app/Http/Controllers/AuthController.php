@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\UserRegisteredMail;
 use App\Models\Role;
 use App\Models\User;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 
 class AuthController extends Controller
 {
@@ -29,6 +31,8 @@ class AuthController extends Controller
         $tokenResult = $user->createToken('api-token', ['posts.read', 'posts.write']);
 
         $token = $tokenResult->accessToken;
+
+        Mail::to($user->email)->queue(new UserRegisteredMail($user)); //Queue
 
         return $this->success([
             'token_type' => 'Bearer',
