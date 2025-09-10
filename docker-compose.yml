@@ -1,0 +1,67 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: .devcontainer/Dockerfile
+    container_name: laravel11-app
+    volumes:
+      - .:/workspaces/${COMPOSE_PROJECT_NAME:-laravel11}
+    working_dir: /workspace
+    command: bash -lc "tail -f /dev/null"
+    environment:
+      - TZ=UTC
+    ports:
+      - "8001:8000"
+    depends_on:
+      # Ahora depende de ambos servicios de base de datos
+      - db
+      - pgsql
+      - redis
+      - mailpit
+
+  # Servicio de MySQL
+  db:
+    image: mysql:8.4.3
+    container_name: laravel11-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: laravel
+      MYSQL_USER: laravel
+      MYSQL_PASSWORD: admin
+    volumes:
+      - dbdata-laravel11:/var/lib/mysql
+    ports:
+      - "3307:3306"
+
+  # Servicio de PostgreSQL (Nuevo)
+  pgsql:
+    image: postgres:16-alpine
+    container_name: laravel11-pgsql
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: laravel
+      POSTGRES_USER: laravel
+      POSTGRES_PASSWORD: admin
+    volumes:
+      - pgdata-laravel11:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+
+  redis:
+    image: redis:7
+    container_name: laravel11-redis
+    ports:
+      - "6379:6379"
+
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: laravel11-mailpit
+    ports:
+      - "8025:8025" # UI
+      - "1025:1025" # SMTP
+
+volumes:
+  dbdata-laravel11:
+  # Nuevo volumen para PostgreSQL
+  pgdata-laravel11:
