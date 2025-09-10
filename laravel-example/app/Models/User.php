@@ -22,8 +22,6 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'provider', // Agrega esta línea
-        'provider_id', // Agrega esta línea
     ];
 
     /**

@@ -21,7 +21,8 @@
         "esbenp.prettier-vscode",
         "vivaxy.vscode-conventional-commits",
         "amiralizadeh9480.laravel-extra-intellisense",
-        "cweijan.vscode-mysql-client2"
+        "cweijan.vscode-mysql-client2",
+        "postman.postman-for-vscode"
       ],
       "settings": {
         "terminal.integrated.shell.linux": "/bin/bash",

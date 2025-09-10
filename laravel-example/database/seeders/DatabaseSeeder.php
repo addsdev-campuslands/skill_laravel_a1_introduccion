@@ -2,22 +2,32 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Database\Seeders\RoleSeeder;
+use Database\Seeders\PostSeeder;
+use App\Models\User;
+use App\Models\Role;
 
 class DatabaseSeeder extends Seeder
 {
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        // User::factory(10)->create();
+        // Primero los roles
+        $this->call(RoleSeeder::class);
 
-        User::factory()->create([
+        // Luego el usuario
+        $user = User::factory()->create([
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
+
+        // Asignar rol viewer
+        $viewerRole = Role::where('name', 'viewer')->first();
+        if ($viewerRole) {
+            $user->roles()->syncWithoutDetaching([$viewerRole->id]);
+        }
+
+        // Finalmente los posts
+        $this->call(PostSeeder::class);
     }
 }

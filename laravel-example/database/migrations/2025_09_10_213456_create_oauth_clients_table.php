@@ -11,11 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('oauth_refresh_tokens', function (Blueprint $table) {
-            $table->char('id', 80)->primary();
-            $table->char('access_token_id', 80)->index();
+        Schema::create('oauth_clients', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->nullableMorphs('owner');
+            $table->string('name');
+            $table->string('secret')->nullable();
+            $table->string('provider')->nullable();
+            $table->text('redirect_uris');
+            $table->text('grant_types');
             $table->boolean('revoked');
-            $table->dateTime('expires_at')->nullable();
+            $table->timestamps();
         });
     }
 
@@ -24,7 +29,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('oauth_refresh_tokens');
+        Schema::dropIfExists('oauth_clients');
     }
 
     /**
