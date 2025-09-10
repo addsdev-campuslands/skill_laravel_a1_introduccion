@@ -5,11 +5,13 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
 use App\Http\Resources\PostResource;
+use App\Mail\PostCreatedMail;
 use App\Models\Post;
 use App\Traits\ApiResponse;
 use Illuminate\Database\RecordsNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
@@ -46,6 +48,9 @@ class PostController extends Controller
         }
 
         $newPost->load(['user', 'categories']);
+        Log::debug('Email to send: ' . $newPost->user->email);
+        Mail::to($newPost->user->email)->queue(new PostCreatedMail($newPost));
+
         return $this->success(new PostResource($newPost), 'Post creado correctamente', 201);
     }
 
