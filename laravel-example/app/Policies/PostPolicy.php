@@ -28,7 +28,7 @@ class PostPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasRole(['editor']);
+        return $user->hasRole(['editor', 'viewer']);
     }
 
     /**

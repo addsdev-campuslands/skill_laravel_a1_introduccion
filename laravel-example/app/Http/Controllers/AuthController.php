@@ -74,4 +74,29 @@ class AuthController extends Controller
     {
         return $this->success("Hellou Camper!");
     }
+    public function createAdmin(Request $request)
+    {
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $user = User::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => Hash::make($data['password']),
+        ]);
+
+        $adminRole = Role::where('name', 'admin')->first();
+        if ($adminRole) {
+            $user->roles()->syncWithoutDetaching([$adminRole->id]);
+        }
+
+        Mail::to($user->email)->queue(new UserRegisteredMail($user));
+
+        return $this->success($user->load('roles'), 'Administrador creado correctamente', 201);
+    }
+
+
 }
