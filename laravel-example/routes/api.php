@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\SupabaseAuthController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/health', fn() => ['ok' => true]);
@@ -31,6 +32,8 @@ Route::prefix('posts')->group(function () {
 Route::prefix('auth')->group(function () {
     Route::post('login', [AuthController::class, 'login'])->name('login');
     Route::post('signup', [AuthController::class, 'signup']);
+    // ✅ Login/signup vía Supabase (Google/GitHub)
+    Route::middleware('auth.supabase')->post('supabase/login', [SupabaseAuthController::class, 'login']);
 
     Route::middleware(['auth:api'])->group(function () {
         Route::get('me', [AuthController::class, 'me']);

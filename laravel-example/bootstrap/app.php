@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\ForceJsonResponse;
 use App\Http\Middleware\RoleMiddleware;
+use App\Http\Middleware\VerifySupabaseToken;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -30,6 +31,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => RoleMiddleware::class,
             'scopes' => CheckToken::class,  // TODOS
             'scope'  => CheckTokenForAnyScope::class, // ALGUNO
+            // ✅ Aquí registras el middleware de Supabase
+            'auth.supabase' => VerifySupabaseToken::class,
         ]);
 
         $middleware->appendToGroup('api', [
