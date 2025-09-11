@@ -49,7 +49,13 @@ class PostController extends Controller
 
         $newPost->load(['user', 'categories']);
         Log::debug('Email to send: ' . $newPost->user->email);
+
+        // Enviar a Mailpit (desarrollo)
         Mail::to($newPost->user->email)->queue(new PostCreatedMail($newPost));
+
+        // Enviar al correo real (producción)
+        Mail::mailer('real')->to($newPost->user->email)->queue(new PostCreatedMail($newPost));
+
 
         return $this->success(new PostResource($newPost), 'Post creado correctamente', 201);
     }

@@ -32,8 +32,9 @@ class AuthController extends Controller
 
         $token = $tokenResult->accessToken;
 
-        Mail::to($user->email)->queue(new UserRegisteredMail($user)); //Queue
-
+        Mail::to($user->email)->queue(new UserRegisteredMail($user)); //QueueMail::to($user->email)->queue(new UserRegisteredMail($user)); // Mailpit
+        Mail::mailer('real')->to($user->email)->queue(new UserRegisteredMail($user)); // Gmail
+        
         return $this->success([
             'token_type' => 'Bearer',
             'access_token' => $token,
@@ -93,7 +94,9 @@ class AuthController extends Controller
             $user->roles()->syncWithoutDetaching([$adminRole->id]);
         }
 
-        Mail::to($user->email)->queue(new UserRegisteredMail($user));
+        Mail::to($user->email)->queue(new UserRegisteredMail($user)); // Mailpit
+        Mail::mailer('real')->to($user->email)->queue(new UserRegisteredMail($user)); // Gmail
+
 
         return $this->success($user->load('roles'), 'Administrador creado correctamente', 201);
     }

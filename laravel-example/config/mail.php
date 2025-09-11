@@ -37,7 +37,7 @@ return [
 
     'mailers' => [
 
-        'smtp' => [
+        'mailpit' => [
             'transport' => 'smtp',
             'scheme' => env('MAIL_SCHEME'),
             'url' => env('MAIL_URL'),
@@ -48,6 +48,18 @@ return [
             'timeout' => null,
             'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url(env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
         ],
+
+        'real' => [
+            'transport' => 'smtp',
+            'host' => env('MAIL_HOST_REAL', 'smtp.gmail.com'),
+            'port' => env('MAIL_PORT_REAL', 587),
+            'username' => env('MAIL_USERNAME_REAL'),
+            'password' => env('MAIL_PASSWORD_REAL'),
+            'encryption' => env('MAIL_ENCRYPTION_REAL', 'tls'),
+            'timeout' => null,
+            'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url(env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
+        ],
+
 
         'ses' => [
             'transport' => 'ses',
