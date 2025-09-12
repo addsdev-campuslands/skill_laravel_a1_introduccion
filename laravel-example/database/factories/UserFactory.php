@@ -2,6 +2,9 @@
 
 namespace Database\Factories;
 
+use App\Models\Post;
+use App\Models\Role;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -40,5 +43,23 @@ class UserFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
         ]);
+    }
+
+    public function withrole(string $roleName = 'viwer') {
+        return $this->afterCreating(function (User $user) use ($roleName) {
+            $role = Role::firstOrCreate(['name' => $roleName]);
+            $user->roles()->attach($role->id);
+        });
+    }
+    public function withroles(array $roleNames = ['viwer']) {
+        return $this->afterCreating(function (User $user) use ($roleNames) {
+            foreach ($roleNames as $name) {
+                $role = Role::firstOrCreate(['name' => $roleNames]);
+                $user->roles()->attach($role->id);
+            }
+        });
+    }
+    public function withPostCount(int $count = 3): static {
+        return $this->hasPosts(Post::factory()->count($count), 'posts');
     }
 }
