@@ -29,4 +29,12 @@ class CreatesUserTest extends TestCase
         // Verificar que el nombre corresponde
         $this->assertEquals('Adrian', $user->name);
     }
+
+    public function test_el_usuario_tiene_un_email_valido()
+    {
+        $user = User::factory()->create();
+
+        $this->assertNotNull($user->email, 'El email del usuario es requerido');
+        $this->assertStringContainsString('@', $user->email);
+    }
 }
