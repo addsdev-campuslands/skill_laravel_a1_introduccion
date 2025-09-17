@@ -12,7 +12,12 @@ class PostSeeder extends Seeder
      */
     public function run(): void
     {
-        //Crear inserts o datos Mocks con Factory
+        // Crear un solo dato con Random haciendo uso de insert
+        // DB::table('posts')->insert([
+        //     'title'=> Str::random(10),
+        //     'content' => Str::random(10).'example@gmail.com',
+        //     'status' => true,
+        // ]);
         Post::factory()->count(50)->create();
     }
 }
