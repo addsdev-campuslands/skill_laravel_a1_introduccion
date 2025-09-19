@@ -12,7 +12,6 @@ class VerifyCsrfToken extends Middleware
      * @var array<int, string>
      */
     protected $except = [
-        'http://localhost:8001/oauth/callback/finish',
-        '/oauth/callback/finish', // Mantén esta, puede ser que el problema sea un slash
+        'register',
     ];
 }

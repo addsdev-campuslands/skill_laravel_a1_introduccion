@@ -29,6 +29,8 @@ Route::prefix('posts')->group(function () {
     });
 });
 
+Route::post('/supabase-auth', [SupabaseAuthController::class, 'handle']);
+
 Route::prefix('auth')->group(function () {
     Route::post('login', [AuthController::class, 'login'])->name('login');
     Route::post('signup', [AuthController::class, 'signup']);
