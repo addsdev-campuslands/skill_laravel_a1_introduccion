@@ -14,6 +14,37 @@ use Illuminate\Support\Facades\Mail;
 class AuthController extends Controller
 {
     use ApiResponse;
+    /**
+     * @OA\Post(
+     *   path="/api/auth/login",
+     *   tags={"Auth"},
+     *   summary="Login y emisión de token",
+     *   @OA\RequestBody(
+     *     required=true,
+     *     @OA\JsonContent(
+     *       required={"email","password"},
+     *       @OA\Property(property="email", type="string", format="email", example="user@test.com"),
+     *       @OA\Property(property="password", type="string", minLength=8, example="pa55Word123$.")
+     *     )
+     *   ),
+     *   @OA\Response(
+     *     response=200, description="OK",
+     *     @OA\JsonContent(
+     *       @OA\Property(property="status", type="string", example="success"),
+     *       @OA\Property(property="message", type="string", nullable=true),
+     *       @OA\Property(property="data", type="object",
+     *         @OA\Property(property="token_type", type="string", example="Bearer"),
+     *         @OA\Property(property="access_token", type="string", example="eyJ0eXAiOiJKV1Qi..."),
+     *         @OA\Property(property="user", type="object",
+     *           @OA\Property(property="email", type="string", example="user@test.com"),
+     *           @OA\Property(property="roles", type="array", @OA\Items(type="string"), example={"viewer","editor"})
+     *         )
+     *       )
+     *     )
+     *   ),
+     *   @OA\Response(response=401, description="Credenciales inválidas")
+     * )
+     */
 
     function login(Request $request)
     {
@@ -45,6 +76,25 @@ class AuthController extends Controller
         ]);
     }
 
+    /**
+     * @OA\Post(
+     *   path="/api/auth/signup",
+     *   tags={"Auth"},
+     *   summary="Registro de usuario",
+     *   @OA\RequestBody(
+     *     required=true,
+     *     @OA\JsonContent(
+     *       required={"name","email","password","password_confirmation"},
+     *       @OA\Property(property="name", type="string", example="Ada Lovelace"),
+     *       @OA\Property(property="email", type="string", format="email", example="ada@example.com"),
+     *       @OA\Property(property="password", type="string", minLength=8, example="pa55Word123$."),
+     *       @OA\Property(property="password_confirmation", type="string", example="pa55Word123$.")
+     *     )
+     *   ),
+     *   @OA\Response(response=201, description="Creado")
+     * )
+     */
+
     function signup(Request $request)
     {
         $data = $request->validate([
@@ -66,10 +116,30 @@ class AuthController extends Controller
         return $this->success($user->load('roles'), 'Usuario creado correctamente', 201);
     }
 
+    /**
+     * @OA\Get(
+     *   path="/api/auth/me",
+     *   tags={"Auth"},
+     *   summary="Perfil basico",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Response(response=200, description="OK")
+     * )
+     */
+
     function me(Request $request)
     {
         return $this->success("Hellou Camper!");
     }
+
+    /**
+     * @OA\Post(
+     *   path="/api/auth/logout",
+     *   tags={"Auth"},
+     *   summary="Cerrar sesión",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Response(response=200, description="OK")
+     * )
+     */
 
     function logout(Request $request)
     {

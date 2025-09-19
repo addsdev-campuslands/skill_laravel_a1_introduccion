@@ -17,9 +17,45 @@ use Illuminate\Support\Facades\Storage;
 class PostController extends Controller
 {
     use ApiResponse;
+    
     /**
-     * Display a listing of the resource.
+     * @OA\Get(
+     *   path="/api/posts",
+     *   tags={"Posts"},
+     *   summary="Listar posts",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Response(
+     *     response=200, description="OK",
+     *     @OA\JsonContent(
+     *       @OA\Property(property="status", type="string", example="success"),
+     *       @OA\Property(property="data", type="array",
+     *         @OA\Items(type="object",
+     *           @OA\Property(property="id", type="integer", example=1),
+     *           @OA\Property(property="title", type="string"),
+     *           @OA\Property(property="slug", type="string"),
+     *           @OA\Property(property="status", type="string", example="draft"),
+     *           @OA\Property(property="cover_image", type="string", nullable=true),
+     *           @OA\Property(property="user", type="object",
+     *             @OA\Property(property="id", type="integer"),
+     *             @OA\Property(property="name", type="string"),
+     *             @OA\Property(property="email", type="string")
+     *           ),
+     *           @OA\Property(property="categories", type="array",
+     *             @OA\Items(type="object",
+     *               @OA\Property(property="id", type="integer"),
+     *               @OA\Property(property="name", type="string")
+     *             )
+     *           ),
+     *           @OA\Property(property="tags", type="array", @OA\Items(type="string")),
+     *           @OA\Property(property="meta", type="object"),
+     *           @OA\Property(property="published_at", type="string", format="date-time", nullable=true)
+     *         )
+     *       )
+     *     )
+     *   )
+     * )
      */
+
     public function index(): JsonResponse
     {
         $posts = Post::with('user', 'categories')->get();
@@ -28,8 +64,34 @@ class PostController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * @OA\Post(
+     *   path="/api/posts",
+     *   tags={"Posts"},
+     *   summary="Crear post",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\RequestBody(
+     *     required=true,
+     *     @OA\MediaType(
+     *       mediaType="multipart/form-data",
+     *       @OA\Schema(
+     *         required={"title","content","status"},
+     *         @OA\Property(property="title", type="string", example="Mi primer post"),
+     *         @OA\Property(property="slug", type="string", example="mi-primer-post"),
+     *         @OA\Property(property="content", type="string", example="Contenido..."),
+     *         @OA\Property(property="status", type="string", enum={"draft","published","archived","default"}),
+     *         @OA\Property(property="published_at", type="string", format="date-time", nullable=true),
+     *         @OA\Property(property="tags[]", type="array", @OA\Items(type="string")),
+     *         @OA\Property(property="meta[seo_title]", type="string", maxLength=60),
+     *         @OA\Property(property="meta[seo_desc]", type="string", maxLength=120),
+     *         @OA\Property(property="category_ids[]", type="array", @OA\Items(type="integer")),
+     *         @OA\Property(property="cover_image", type="string", format="binary", nullable=true)
+     *       )
+     *     )
+     *   ),
+     *   @OA\Response(response=201, description="Creado")
+     * )
      */
+
     public function store(StorePostRequest $request): JsonResponse
     {
         $data = $request->validated();
@@ -61,7 +123,15 @@ class PostController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * @OA\Get(
+     *   path="/api/posts/{id}",
+     *   tags={"Posts"},
+     *   summary="Detalle de post",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Response(response=200, description="OK"),
+     *   @OA\Response(response=404, description="No encontrado")
+     * )
      */
     public function show(string $id): JsonResponse // Post $post
     {
@@ -76,7 +146,34 @@ class PostController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * @OA\Put(
+     *   path="/api/posts/{id}",
+     *   tags={"Posts"},
+     *   summary="Actualizar post",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\RequestBody(
+     *     required=false,
+     *     @OA\MediaType(
+     *       mediaType="multipart/form-data",
+     *       @OA\Schema(
+     *         @OA\Property(property="title", type="string"),
+     *         @OA\Property(property="slug", type="string"),
+     *         @OA\Property(property="content", type="string"),
+     *         @OA\Property(property="status", type="string", enum={"draft","published","archived"}),
+     *         @OA\Property(property="published_at", type="string", format="date-time", nullable=true),
+     *         @OA\Property(property="tags[]", type="array", @OA\Items(type="string")),
+     *         @OA\Property(property="meta[seo_title]", type="string"),
+     *         @OA\Property(property="meta[seo_desc]", type="string"),
+     *         @OA\Property(property="category_ids[]", type="array", @OA\Items(type="integer")),
+     *         @OA\Property(property="cover_image", type="string", format="binary", nullable=true)
+     *       )
+     *     )
+     *   ),
+     *   @OA\Response(response=200, description="OK"),
+     *   @OA\Response(response=403, description="No autorizado"),
+     *   @OA\Response(response=422, description="Validación")
+     * )
      */
     public function update(UpdatePostRequest $request, Post $post)
     {
