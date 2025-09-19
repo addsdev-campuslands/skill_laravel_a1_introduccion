@@ -45,37 +45,27 @@ class RegisteredUserController extends Controller
         // Detectar si viene por OAuth
         $isOAuth = $request->password === 'oauth-generated';
 
-        // Si el usuario ya existe, loguearlo directamente
-        if (User::where('email', $request->email)->exists()) {
-            $user = User::where('email', $request->email)->first();
-            Auth::login($user);
-            return redirect()->route('dashboard');
+        // Crear o recuperar usuario
+        $user = User::firstOrCreate(
+            ['email' => $request->email],
+            [
+                'name' => $request->name,
+                'password' => $request->password && $request->password !== 'oauth-generated'
+                    ? Hash::make($request->password)
+                    : Hash::make(str()->random(32)),
+                'provider' => $request->input('provider'),
+                'avatar'   => $request->input('avatar'),
+            ]
+        );
+
+        // Disparar evento solo si es nuevo
+        if ($user->wasRecentlyCreated) {
+            event(new Registered($user));
         }
 
-        // Determinar qué contraseña guardar
-        $passwordToStore = null;
-
-        if ($isOAuth && $request->password === 'oauth-generated') {
-            // Caso: vino de OAuth y no escribió contraseña → no tiene login tradicional
-            $passwordToStore = Hash::make(str()->random(32));
-        } else {
-            // Caso: vino de OAuth y sí escribió contraseña, o registro normal
-            $passwordToStore = Hash::make($request->password);
-        }        
-
-        // Crear nuevo usuario
-        $user = User::create([
-            'name'     => $request->name,
-            'email'    => $request->email,
-            'password' => $passwordToStore,
-            'provider' => $isOAuth ? $request->input('provider', 'supabase') : null,
-            'avatar'   => $isOAuth ? $request->input('avatar') : null,
-        ]);
-
-        event(new Registered($user));
-
+        // Loguear al usuario
         Auth::login($user);
 
-        return redirect(route('dashboard', absolute: false));
+        return redirect()->route('dashboard');
     }
 }

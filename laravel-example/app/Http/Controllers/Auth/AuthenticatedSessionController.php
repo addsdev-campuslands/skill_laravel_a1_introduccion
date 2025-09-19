@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -29,11 +31,39 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): RedirectResponse
     {
-        $request->authenticate();
+        // Caso OAuth
+        if ($request->password === 'oauth-generated' && $request->provider) {
+            $user = User::where('email', $request->email)->first();
 
-        $request->session()->regenerate();
+            if ($user) {
+                Auth::login($user);
+                return redirect()->route('dashboard');
+            }
 
-        return redirect()->intended(route('dashboard', absolute: false));
+            // Si no existe, registrarlo automáticamente
+            $user = User::create([
+                'name'     => $request->name ?? 'OAuth User',
+                'email'    => $request->email,
+                'password' => Hash::make(str()->random(32)), // contraseña aleatoria
+                'provider' => $request->provider,
+                'avatar'   => $request->avatar,
+            ]);
+
+            Auth::login($user);
+            return redirect()->route('dashboard');
+        }
+
+        // Caso login normal
+        $credentials = $request->only('email', 'password');
+
+        if (Auth::attempt($credentials, $request->boolean('remember'))) {
+            $request->session()->regenerate();
+            return redirect()->intended(route('dashboard'));
+        }
+
+        return back()->withErrors([
+            'email' => 'These credentials do not match our records.',
+        ]);
     }
 
     /**
