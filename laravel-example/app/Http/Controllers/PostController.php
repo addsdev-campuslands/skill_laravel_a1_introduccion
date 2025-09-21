@@ -133,6 +133,7 @@ class PostController extends Controller
      *   @OA\Response(response=404, description="No encontrado")
      * )
      */
+
     public function show(string $id): JsonResponse // Post $post
     {
         //$result = Post::findOrFail($id);
@@ -175,6 +176,7 @@ class PostController extends Controller
      *   @OA\Response(response=422, description="Validación")
      * )
      */
+
     public function update(UpdatePostRequest $request, Post $post)
     {
         //use Illuminate\Support\Facades\Log;
@@ -202,13 +204,33 @@ class PostController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * @OA\Delete(
+     *   path="/api/posts/{id}",
+     *   tags={"Posts"},
+     *   summary="Eliminar (soft-delete) post",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Response(response=204, description="Sin contenido")
+     * )
      */
+
     public function destroy(Post $post): JsonResponse
     {
         $post->delete(); //Soft delete
         return $this->success(null, 'Post eliminado', 204);
     }
+
+    /**
+     * @OA\Post(
+     *   path="/api/posts/{id}/restore",
+     *   tags={"Posts"},
+     *   summary="Restaurar post eliminado",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Response(response=200, description="OK"),
+     *   @OA\Response(response=500, description="Error al no encontrar registro (RecordsNotFoundException)")
+     * )
+     */
 
     public function restore(int $id): JsonResponse
     {

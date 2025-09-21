@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Mail;
 class AuthController extends Controller
 {
     use ApiResponse;
+    
     /**
      * @OA\Post(
      *   path="/api/auth/login",
